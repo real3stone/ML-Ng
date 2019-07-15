@@ -49,19 +49,19 @@ X = [ones(m, 1) X];
 %                 initial_theta, options);
 %
 
-for i = 1:num_labels
-	initial_theta = zeros(n+1, 1);
+
+for c = 1:num_labels
+	initial_theta = zeros(n + 1, 1);
+	
 	options = optimset('GradObj', 'on', 'MaxIter', 50);
-	[initial_theta]=fmincg(@(t)(lrCostFunction(t, X, y == i, lambda)), initial_theta, options);
-	all_theta(i,:) = initial_theta;
+	
+	[theta] =  ...
+		fmincg (@(t)(lrCostFunction(t, X, (y == c), lambda)), initial_theta, options);
+	% y == c 例如c = 8;则所有非8的y项都变为0,8的项变为1
+	all_theta(c, :) = theta';
+	%size(theta')
+	
 end
-
-
-
-
-
-
-
 
 
 % =========================================================================

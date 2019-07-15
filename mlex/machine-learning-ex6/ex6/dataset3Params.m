@@ -23,28 +23,31 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
-%C_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
-%sigma_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
-%errors = zeros(8, 8);
-%
-%for i = 1:8
-%	for j = 1:8
-%		model = svmTrain(X, y, C_vec(i), @(x1, x2) gaussianKernel(x1, x2, sigma_vec(j)));
-%		predictions = svmPredict(model, Xval);
-%		errors(i, j) = mean(double(predictions ~= yval));
-%	end
-%end
+possible_value = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
+p_m = size(possible_value);
 
-%e = min(min(errors));
-%[r, c] = find(errors == e);
+select_C = 0.01;
+select_sigma = 0.01;
+error_rate = 1;
 
-%C = C_vec(r);
-%sigma = sigma_vec(c);
+for i = 1:p_m
+	C = possible_value(i);
+	for j = 1:p_m
+		sigma = possible_value(j);	
+		model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma));
+		pred = svmPredict(model, Xval);
+		
+		cur_error_rate = mean(double(pred ~= yval));
+		if(cur_error_rate < error_rate)
+			error_rate = cur_error_rate;
+			select_C = C;
+			select_sigma = sigma;
+		end
+	end
+end
 
-C = 1;
-sigma = 0.1;
-
-
+C = select_C;
+sigma = select_sigma;
 
 
 % =========================================================================

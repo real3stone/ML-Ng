@@ -25,7 +25,6 @@ if size(X, 2) <= 3
     % Legend, specific for the exercise
     legend('Admitted', 'Not admitted', 'Decision Boundary')
     axis([30, 100, 30, 100])
-    fprintf('1\n');
 else
     % Here is the grid range
     u = linspace(-1, 1.5, 50);

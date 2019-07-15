@@ -3,12 +3,12 @@ function [J, grad] = lrCostFunction(theta, X, y, lambda)
 %regularization
 %   J = LRCOSTFUNCTION(theta, X, y, lambda) computes the cost of using
 %   theta as the parameter for regularized logistic regression and the
-%   gradient of the cost w.r.t. to the parameters. 
+%   gradient of the cost w.r.t. to the parameters.
 
 % Initialize some useful values
 m = length(y); % number of training examples
 
-% You need to return the following variables correctly 
+% You need to return the following variables correctly
 J = 0;
 grad = zeros(size(theta));
 
@@ -31,23 +31,20 @@ grad = zeros(size(theta));
 %       there're many possible vectorized solutions, but one solution
 %       looks like:
 %           grad = (unregularized gradient for logistic regression)
-%           temp = theta; 
+%           temp = theta;
 %           temp(1) = 0;   % because we don't add anything for j = 0  
 %           grad = grad + YOUR_CODE_HERE (using the temp variable)
 %
+h = sigmoid(X * theta);
+cost_value = (-1) * y' * log(h) - (1 - y)' * log(1- h);
+reg_theta = (lambda / (2*m)) * sum(theta(2:end, :).^2); % excluding first column
 
-J = 1/m*sum(-y.*log(sigmoid(X*theta))-(1.-y).*log(1.-sigmoid(X*theta)));
-J = J + lambda/(2*m)*(sum(theta.^2)-theta(1)^2);
+J = (1/m) * cost_value + reg_theta;
 
-grad = 1/m*(X'*(sigmoid(X*theta)-y));
-grad(2:length(grad)) = grad(2:length(grad))+ lambda/m*theta(2:length(theta));
+grad_reg_theta = (lambda/m) * theta;
+grad_reg_theta(1) = 0;
 
-
-
-
-
-
-
+grad = (1/m) * X' * (h - y) + grad_reg_theta;
 
 % =============================================================
 

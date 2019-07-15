@@ -62,126 +62,51 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-%% Part 1
+X = [ones(m, 1) X];
 
-a1 = [ones(m, 1) X];
-
-z2 =  a1 * Theta1';
-
-a2 = sigmoid(z2);
-
-a2 = [ones(size(a2, 1), 1) a2]
-
-z3 = a2 * Theta2';
-
-a3 = sigmoid(z3);
-
-Y = zeros(m, num_labels);
+DELTA_1 = zeros(hidden_layer_size, input_layer_size + 1);
+DELTA_2 = zeros(num_labels, hidden_layer_size + 1);
 
 for i = 1:m
-	Y(i, y(i)) = 1;
+
+	v_y = zeros(num_labels, 1);
+	v_y(y(i)) = 1;  % turn y into vector
+
+	% Feedforward
+	a_1 = X(i, :)';
+	a_2 = sigmoid(Theta1 * a_1);
+	a_2 = [1; a_2];
+	a_3 = sigmoid(Theta2 * a_2);
+	
+	cost_value = -v_y' * log(a_3) - (1 - v_y)' * log(1 - a_3); % sum of all K labels
+	
+	J = J + cost_value;
+	
+	% Backpropagation
+	delta3 = a_3 - v_y;
+	delta2 = (Theta2' * delta3) .* sigmoidGradient([1; Theta1 * a_1]);
+	delta2 = delta2(2:end); % remove delta2(1)
+		
+	DELTA_2 = DELTA_2 + delta3 * a_2';
+	DELTA_1 = DELTA_1 + delta2 * a_1';
+	
 end
 
+Theta1_grad = (1/m) * DELTA_1 + (lambda/m) * Theta1; % regularization
+Theta2_grad = (1/m) * DELTA_2 + (lambda/m) * Theta2;
 
-for i = 1:m
-	for k = 1:num_labels
-		J = J +(-Y(i, k)*log(a3(i,k))-(1-Y(i,k))*log(1-a3(i,k)));
-	end
-end
+Theta1_grad(:, 1) -= (lambda/m) * Theta1(:, 1); % without theta(1)
+Theta2_grad(:, 1) -= (lambda/m) * Theta2(:, 1);
 
-J = J/m;
+J = (1/m) * J;
 
-%% Part 2
+% regularization   Theta from 2;
+% Theta1 = 25x401, so first column of Theta1 should not be added
+% Theta2 = 10x26, same as above
+reg_theta = ( sum(sum(Theta1.^2)) + sum(sum(Theta2.^2)) )...
+	- sum(Theta1(:, 1).^2) - sum(Theta2(:, 1).^2);   
 
-Delta2 = zeros(size(Theta2))
-Delta1 = zeros(size(Theta1))
-
-for t = 1:m
-
-	%step1
-
-	a1 = [1 X(t,:)];
-	z2 = a1 * Theta1';
-	a2 = [1 sigmoid(z2)];
-	z3 = a2 * Theta2';
-	a3 = sigmoid(z3);
-
-	%step2
-
-	delta3 = a3 - Y(t, :);
-
-	%step3
-
-	z2 = [1 z2];
-	delta2 = delta3 * Theta2 .* sigmoidGradient(z2);
-
-	%step4
-
-	delta2 = delta2(1,2:end);
-	Delta2 = Delta2 + delta3'*a2;
-	Delta1 = Delta1 + delta2'*a1;
-
-end
-
-%step5
-
-Delta1 = Delta1/m;
-Delta2 = Delta2/m;
-
-Theta1_grad = Delta1;
-Theta2_grad = Delta2;
-
-%% Part 3
-
-
-L = 0;
-
-[r1 c1] = size(Theta1);
-
-for i = 1:r1
-	for j = 2:c1
-		L = L + Theta1(i,j)^2;
-	end
-end
-
-[r2 c2] = size(Theta2);
-
-for i = 1:r2
-	for j = 2:c2
-		L = L + Theta2(i,j)^2;
-	end
-end
-
-J = J + L*lambda/(2*m);
-
-
-Reg1 = zeros(size(Theta1));
-Reg2 = zeros(size(Theta2));
-
-Reg1(:,2:end) = Reg1(:,2:end) + Theta1(:,2:end)*lambda/m;
-Reg2(:,2:end) = Reg2(:,2:end) + Theta2(:,2:end)*lambda/m;
-
-Delta1 = Delta1 + Reg1;
-Delta2 = Delta2 + Reg2;
-
-Theta1_grad = Delta1;
-Theta2_grad = Delta2;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+J = J + (lambda / (2*m)) * reg_theta;
 % -------------------------------------------------------------
 
 % =========================================================================

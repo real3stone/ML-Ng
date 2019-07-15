@@ -26,20 +26,16 @@ centroids = zeros(K, n);
 % Note: You can use a for-loop over the centroids to compute this.
 %
 
-for i = 1:K
-	centroidI = [];
-	for j = 1:m
-		if idx(j) == i
-			centroidI = [centroidI ; X(j,:)];
-		end
-	end
-	centroids(i,:) = mean(centroidI,1);
+cluster_num = zeros(K, 1);
+
+% how to vectorized?
+for i = 1:m
+	centroids(idx(i), :) += X(i, :);
+	cluster_num(idx(i))++;
 end
 
-
-
-
-
+centroids ./= cluster_num;
+% centroids = centroids ./ cluster_num;
 
 % =============================================================
 

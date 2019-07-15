@@ -20,21 +20,23 @@ idx = zeros(size(X,1), 1);
 %
 % Note: You can use a for-loop over the examples to compute this.
 %
+m = size(X(:,1));
+dis = zeros(K, 1); % distance
 
-for i = 1:size(X,1)
-	minc = inf;
-		for j = 1:K
-		minc1 = sum((X(i,:) - centroids(j,:)).^2);
-		if minc1 < minc
-			minc = minc1;
-			idx(i) = j;
-		end
-	end
+%for i = 1:m
+%	for j = 1:K
+%		temp = X(i, :) - centroids(j, :);
+%		dis(j) = sum(temp.^2);
+%	end
+%	[min_value, idx(i)] = min(dis);
+%end
+
+% vecorized inplementation
+for i = 1:m
+	temp = X(i, :) - centroids;
+	dis = sum(temp.^2, 2); % sum of every row
+	[min_value, idx(i)] = min(dis);
 end
-
-
-
-
 
 
 % =============================================================

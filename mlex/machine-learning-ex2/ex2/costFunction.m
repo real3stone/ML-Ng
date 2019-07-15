@@ -19,16 +19,14 @@ grad = zeros(size(theta));
 %
 % Note: grad should have the same dimensions as theta
 %
+h = zeros(m, 1);
+h = sigmoid(X * theta);  % mxn * nx1 = mx1
 
-v = sigmoid(X*theta);
-v1 = -y.*(log(v)) - (ones(m,1)-y).*(log(ones(m, 1)-v));
-J = 1/m*sum(v1);
+cost_value = (-1) * y' * log(h) - (1 - y)' * log(1 - h);
 
-grad = 1/m*(X'*(v-y));
+J = (1 / m) * cost_value;
 
-
-
-
+grad = (1 / m) * X' * (h - y);
 
 % =============================================================
 

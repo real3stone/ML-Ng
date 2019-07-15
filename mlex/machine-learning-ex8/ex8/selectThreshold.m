@@ -9,6 +9,7 @@ function [bestEpsilon bestF1] = selectThreshold(yval, pval)
 bestEpsilon = 0;
 bestF1 = 0;
 F1 = 0;
+cvPred = zeros(size(pval, 1));
 
 stepsize = (max(pval) - min(pval)) / 1000;
 for epsilon = min(pval):stepsize:max(pval)
@@ -23,39 +24,17 @@ for epsilon = min(pval):stepsize:max(pval)
     % Note: You can use predictions = (pval < epsilon) to get a binary vector
     %       of 0's and 1's of the outlier predictions
 
-
-    tp = 0;
-    fp = 0;
-    fn = 0;
-    predictions = (pval < epsilon);
-    
-    % use vector
-    tp = sum((predictions == 1) & (yval == 1));
-    fp = sum((predictions == 0) & (yval == 1));
-    fn = sum((predictions == 1) & (yval == 0));
-
-    % use for loop
-    %for i = 1:size(yval,1)
-    %    tp = tp + ((predictions(i) == 1) & (yval(i) == 1));
-    %    fp = fp + ((predictions(i) == 0) & (yval(i) == 1));
-    %    fn = fn + ((predictions(i) == 1) & (yval(i) == 0));
-    %end
-
-    prec = tp / (tp + fp);
-    rec = tp / (tp + fn);
-
-    F1 = 2 * prec * rec / (prec + rec);
-
-
-
-
-
-
-
-
-
-
-
+	cvPred = (pval < epsilon);
+	
+	tp = sum((cvPred == 1) & yval == 1);
+	fn = sum((cvPred == 0) & yval == 1);  % !!
+	fp = sum((cvPred == 1) & yval == 0);
+	prec = tp / (tp+fp);
+	rec = tp / (tp+fn);
+	
+	F1 = (2 * prec * rec) / (prec + rec);
+	% fprintf('epsilon = %f F1 = %f\n', epsilon, F1);
+	% pause;
     % =============================================================
 
     if F1 > bestF1

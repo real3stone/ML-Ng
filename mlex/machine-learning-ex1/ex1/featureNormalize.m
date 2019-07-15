@@ -24,11 +24,21 @@ sigma = zeros(1, size(X, 2));
 %               each feature. 
 %
 % Hint: You might find the 'mean' and 'std' functions useful.
-%
+%       
+
+m = length(X_norm(:, 1)); %number of examples
+n = length(X_norm(1, :)); % number of features
 
 mu = mean(X_norm);
 sigma = std(X_norm);
-X_norm = (X_norm.-mu)./sigma;
+
+
+for i = 1:m
+
+	X_norm(i, :) = (X_norm(i, :) - mu) ./ sigma;
+
+end
+
 
 
 

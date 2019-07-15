@@ -21,18 +21,16 @@ p = zeros(size(X, 1), 1);
 %       can use max(A, [], 2) to obtain the max for each row.
 %
 
+for i = 1:m
+	a1 = [1 X(i, :)]'; % add bias unit and Transpose
+	pred_a2 = sigmoid(Theta1 * a1);
+	pred_a2 = [1; pred_a2];  % add bias unit
+	pred_a3 = sigmoid(Theta2 * pred_a2);
 
-X = [ones(m, 1) X];
-a1 = sigmoid(Theta1*X');
-k = size(a1, 2);
-a1 = [ones(1, k);a1];
-a2 = sigmoid(Theta2*a1);
-
-
-[A p] = max(a2);
-fprintf("%d", p);
-
-p = p';
+	[max_value, max_pos] = max(pred_a3); % get max probability
+	p(i) = max_pos;
+	
+end
 
 % =========================================================================
 

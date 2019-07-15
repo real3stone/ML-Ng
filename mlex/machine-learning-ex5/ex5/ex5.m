@@ -218,3 +218,55 @@ end
 
 fprintf('Program paused. Press enter to continue.\n');
 pause;
+
+%% =========== Part 9: Optional Exercise: Computing test set error =============
+error_test = zeros(size(lambda_vec), 1);
+for i = 1:length(lambda_vec)
+	[theta] = trainLinearReg(X_poly, y, lambda_vec(i));
+	error_test(i) = linearRegCostFunction(X_poly_test, ytest, theta, 0);
+end
+fprintf('lambda\t\tTest Error\n');
+for i = 1:length(lambda_vec)
+	fprintf(' %f\t%f\n', ...
+            lambda_vec(i), error_test(i));
+end
+
+fprintf('Program paused. Press enter to continue.\n');
+pause;
+
+%% =========== Part 10: Optional Exercise: Plotting learning curve with randomly selected examples =========
+% Randomly select i examples
+lambda = 0.01;
+num_of_ex = 12;
+repeated_times = 50;
+error_train = zeros(num_of_ex, 1);
+error_val = zeros(num_of_ex, 1);
+for i = 1:num_of_ex
+	for j = 1:repeated_times
+		sel = randperm(size(X, 1)); %random indices
+		sel = sel(1:i);
+		[theta] = trainLinearReg(X_poly(sel, :), y(sel,:), lambda);
+		error_train(i) += linearRegCostFunction(X_poly(sel, :), y(sel, :), theta, 0);
+		error_val(i) += linearRegCostFunction(X_poly_val(sel, :), yval(sel, :), theta, 0);
+	end
+	error_train(i) /= repeated_times;
+	error_val(i) /= repeated_times;
+	fprintf("now number of examples is %d\n", i);
+end
+
+fprintf('num_of_ex\tTrain Error\tValidation Error\n');
+for i = 1:num_of_ex
+	fprintf(' %f\t%f\t%f\n', ...
+            i, error_train(i), error_val(i));
+end
+
+fprintf('Program paused. Press enter to continue.\n');
+pause;
+
+% plot
+close all;
+plot([1:num_of_ex], error_train, [1:num_of_ex], error_val);
+legend('Train', 'Cross Validation');
+xlabel('Number of training examples');
+ylabel('Error');
+hold on;
